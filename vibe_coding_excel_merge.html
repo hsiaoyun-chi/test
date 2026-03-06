@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Vibe Coding 檔案匯整</title>
+</head>
+
+<body style="font-family:Arial">
+
+<h1>Vibe Coding 檔案匯整</h1>
+
+<input type="file" id="excelFiles" multiple>
+
+<button onclick="mergeExcel()">合併 Excel</button>
+
+<h3>結果預覽 (前5筆)</h3>
+<pre id="output"></pre>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script>
+
+function mergeExcel(){
+
+    const files = document.getElementById('excelFiles').files;
+
+    let allData = [];
+
+    let fileCount = 0;
+
+    for(let file of files){
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            const data = new Uint8Array(e.target.result);
+
+            const workbook = XLSX.read(data, {type:'array'});
+
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+            const json = XLSX.utils.sheet_to_json(sheet);
+
+            allData = allData.concat(json);
+
+            fileCount++;
+
+            if(fileCount === files.length){
+
+                document.getElementById("output").textContent =
+                JSON.stringify(allData.slice(0,5), null, 2);
+
+            }
+
+        };
+
+        reader.readAsArrayBuffer(file);
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
